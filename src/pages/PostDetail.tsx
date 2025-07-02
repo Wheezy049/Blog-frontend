@@ -17,6 +17,7 @@ function PostDetail() {
   const [loading, setLoading] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
+  const token = localStorage.getItem("access_token");
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -40,7 +41,11 @@ function PostDetail() {
     if (!id) return;
     setLoading(true);
     try {
-      await axios.delete(`http://localhost:8000/api/blog/${id}`);
+      await axios.delete(`http://localhost:8000/api/blog/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setLoading(false);
       toast.success("Post deleted successfully!");
       navigate("/");
@@ -77,16 +82,18 @@ function PostDetail() {
         </div>
       </div>
       <div className="mt-3 flex justify-end">
-        <button
-          onClick={handleDelete}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors duration-200 focus:outline-none focus:shadow-outline flex gap-2 items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={loading}
-        >
-          {loading && (
-            <div className="w-8 h-8 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
-          )}
-          {loading ? "Deleting..." : "Delete Post"}
-        </button>
+        {token && (
+          <button
+            onClick={handleDelete}
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors duration-200 focus:outline-none focus:shadow-outline flex gap-2 items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={loading}
+          >
+            {loading && (
+              <div className="w-8 h-8 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+            )}
+            {loading ? "Deleting..." : "Delete Post"}
+          </button>
+        )}
       </div>
     </div>
   );
